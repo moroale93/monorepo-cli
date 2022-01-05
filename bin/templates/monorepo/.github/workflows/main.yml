@@ -1,0 +1,129 @@
+name: Deployment
+
+on:
+  push:
+    branches: [ main ]
+
+  workflow_dispatch:
+
+jobs:
+  preparation:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Setup node
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16.x'
+          registry-url: 'https://registry.npmjs.org'
+      - name: Setup alpine
+        uses: docker://timbru31/node-alpine-git
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+      - name: Install dependencies
+        if: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }} != 'true'
+        run: yarn install --cache-folder=.yarn-cache --ignore-platform --non-interactive --prefer-offline
+
+  build:
+    needs: preparation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+      - name: Build packages
+        uses: docker://timbru31/node-alpine-git
+      - name: Check for changed packages
+        run: CHANGED_PACKAGES=$(yarn --silent changed | paste -sd, -)
+      - name: Link changed packages
+        run: yarn bin lerna version minor --yes --no-git-tag-version --no-push
+      - name: Build changed packages
+        run: 'test -z "$CHANGED_PACKAGES" || yarn build --scope="{,$CHANGED_PACKAGES}" --include-dependencies'
+      - name: Build all packages if main branch
+        run: 'test "$GITHUB_REF" = "main" || yarn build'
+      - name: Archive build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: code-builds
+          path: |
+            packages/*/build
+            packages/*/dist
+    
+  lint:
+    needs: preparation
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: docker://timbru31/node-alpine-git
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+      - run: yarn lint
+    
+  test:
+    needs: preparation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+      - name: Test execution
+        uses: docker://timbru31/node-alpine-git
+      - name: Run test
+        run: yarn test:ci
+  
+  deploy-libraries:
+    needs: [ build, lint, test ]
+    runs-on: ubuntu-latest
+    environment: cicd
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+      - name: Download artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: code-builds
+      - name: Setup git email config
+        run: git config --global user.email "$GIT_PUBLISHER_EMAIL"
+        env:
+            GIT_PUBLISHER_EMAIL: ${{ secrets.GIT_PUBLISHER_EMAIL }}
+      - name: Setup git name config
+        run: git config --global user.name "Automated Publisher"
+      - name: Setup npm registry
+        run: echo "//registry.npmjs.org/:_authToken=$NODE_AUTH_TOKEN" >> .npmrc
+        env:
+            NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Setup npm configs
+        run: echo "unsafe-perm=true" >> .npmrc
+      - name: Skip npmrc changes
+        run: git update-index --assume-unchanged .npmrc
+      - name: Update versions
+        run: yarn lerna version
+      - name: Publish versions
+        run: yarn lerna publish from-package
+        env:
+            NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

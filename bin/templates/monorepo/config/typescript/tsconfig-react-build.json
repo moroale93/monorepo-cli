@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "declaration": true,
+    "inlineSourceMap": true,
+    "inlineSources": true,
+    "paths": {},
+    "sourceMap": false
+  },
+  "exclude": [
+    "node_modules",
+    "__tests__",
+    "*.test.ts",
+    "*.test.tsx"
+  ],
+  "extends": "./tsconfig-react.json"
+}

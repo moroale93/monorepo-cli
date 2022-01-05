@@ -1,0 +1,21 @@
+{
+  "kind": "react-app",
+  "main": "dist",
+  "license": "UNLICENSED",
+  "scripts": {
+    "test": "jest",
+    "build": "yarn clean && run-p build:*",
+    "build:app": "webpack --config ./config/webpack/webpack.config.prod.js --mode production",
+    "start": "webpack serve --config ./config/webpack/webpack.config.dev.js",
+    "clean": "rm -rf ./dist",
+    "test:ci": "jest --coverage --ci"
+  },
+  "devDependencies": {
+    "clean-webpack-plugin": "^4.0.0",
+    "html-webpack-plugin": "^5.5.0",
+    "ts-loader": "^9.2.6",
+    "webpack": "^5.65.0",
+    "webpack-cli": "^4.9.1",
+    "webpack-dev-server": "^4.7.2"
+  }
+}

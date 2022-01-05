@@ -1,0 +1,28 @@
+{
+  "name": "frontend-monorepo-cli",
+  "version": "1.0.3",
+  "author": "Alessandro Moretto <moro.ale.93@gmail.com>",
+  "license": "MIT",
+  "bin": {
+    "create-ts-library": "bin/create-ts-library.js",
+    "create-react-app": "bin/create-react-app.js",
+    "generate-monorepo": "bin/generate-monorepo.js"
+  },
+  "dependencies": {
+    "deepmerge": "^4.2.2",
+    "yargs": "^17.3.1"
+  },
+  "description": "This project is a CLI to setup a monorepo and create various types of packages.",
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/moroale93/monorepo-cli.git"
+  },
+  "bugs": {
+    "url": "https://github.com/moroale93/monorepo-cli/issues"
+  },
+  "homepage": "https://github.com/moroale93/monorepo-cli#readme"
+}
