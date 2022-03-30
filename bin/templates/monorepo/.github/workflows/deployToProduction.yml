@@ -1,0 +1,44 @@
+name: Deployment
+
+on:
+  release:
+    types: [published]
+
+  workflow_dispatch:
+
+jobs:
+  common:
+    uses: ./.github/workflows/common.yml
+
+  deploy-application-to-production:
+    needs: [ common ]
+    runs-on: ubuntu-latest
+    environment: cicd
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Download artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: code-builds
+          path: ./packages
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+      - name: install wrangler
+        run: npm install -g @cloudflare/wrangler
+      - name: Login to cloudflare
+        run: echo $CF_API_TOKEN | wrangler config
+        env:
+          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+      - name: Deploy to production apps
+        run: yarn deploy production
+      - name: Create dns entry
+        run: node scripts/deploy-application.js production
+        env:
+          CF_EMAIL: ${{ secrets.CF_EMAIL }}
+          CF_API_KEY: ${{ secrets.CF_API_KEY }}
+          CF_ZONE_ID: c8bf4d84a7912cd966204bb83946d7fd

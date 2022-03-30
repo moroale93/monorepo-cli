@@ -1,10 +1,7 @@
-name: Deployment
+name: Common steps
 
 on:
-  push:
-    branches: [ main ]
-
-  workflow_dispatch:
+  workflow_call:
 
 jobs:
   preparation:
@@ -18,8 +15,6 @@ jobs:
         with:
           node-version: '16.x'
           registry-url: 'https://registry.npmjs.org'
-      - name: Setup alpine
-        uses: docker://timbru31/node-alpine-git
       - name: Cache dependencies
         uses: actions/cache@v2
         with:
@@ -27,7 +22,7 @@ jobs:
           key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
       - name: Install dependencies
         if: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }} != 'true'
-        run: yarn install --cache-folder=.yarn-cache --ignore-platform --non-interactive --prefer-offline
+        run: yarn install
 
   build:
     needs: preparation
@@ -41,8 +36,6 @@ jobs:
         with:
           path: '**/node_modules'
           key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
-      - name: Build packages
-        uses: docker://timbru31/node-alpine-git
       - name: Check for changed packages
         run: CHANGED_PACKAGES=$(yarn --silent changed | paste -sd, -)
       - name: Link changed packages
@@ -56,7 +49,7 @@ jobs:
         with:
           name: code-builds
           path: |
-            packages/*/build
+            packages/*/package.json
             packages/*/dist
     
   lint:
@@ -64,8 +57,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
-      - uses: docker://timbru31/node-alpine-git
+      - name: Checkout repository
+        uses: actions/checkout@v2
       - name: Cache dependencies
         uses: actions/cache@v2
         with:
@@ -85,45 +78,5 @@ jobs:
         with:
           path: '**/node_modules'
           key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
-      - name: Test execution
-        uses: docker://timbru31/node-alpine-git
       - name: Run test
         run: yarn test:ci
-  
-  deploy-libraries:
-    needs: [ build, lint, test ]
-    runs-on: ubuntu-latest
-    environment: cicd
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-      - name: Cache dependencies
-        uses: actions/cache@v2
-        with:
-          path: '**/node_modules'
-          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
-      - name: Download artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: code-builds
-      - name: Setup git email config
-        run: git config --global user.email "$GIT_PUBLISHER_EMAIL"
-        env:
-            GIT_PUBLISHER_EMAIL: ${{ secrets.GIT_PUBLISHER_EMAIL }}
-      - name: Setup git name config
-        run: git config --global user.name "Automated Publisher"
-      - name: Setup npm registry
-        run: echo "//registry.npmjs.org/:_authToken=$NODE_AUTH_TOKEN" >> .npmrc
-        env:
-            NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-      - name: Setup npm configs
-        run: echo "unsafe-perm=true" >> .npmrc
-      - name: Skip npmrc changes
-        run: git update-index --assume-unchanged .npmrc
-      - name: Update versions
-        run: yarn lerna version
-      - name: Publish versions
-        run: yarn lerna publish from-package
-        env:
-            NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

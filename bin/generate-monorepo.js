@@ -15,7 +15,6 @@ async function initialize() {
   await executeCommand('yarn add -dev lerna@^3.22.0');
   // initialize lerna
   await executeCommand('yarn bin lerna init');
-  await executeCommand('rm -rf .git');
   // copy the monorepo files into the new monorepo
   await executeCommand(`cp -rf ${__dirname}/templates/monorepo/ ./`);
   // merges the package.json with the template

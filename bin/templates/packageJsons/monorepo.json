@@ -7,6 +7,7 @@
     "clean": "rm -rf .jest-cache && find packages -type f -regex \".*/*.log\" | xargs rm -f && find packages -type d -regex \".*/build\" | xargs rm -rf && find packages -type d -regex \".*/dist\" | xargs rm -rf && find packages -type d -regex \".*/coverage\" | xargs rm -rf && lerna run clean",
     "lint": "eslint . --ext=.js,.jsx,.ts,.tsx",
     "start": "lerna run start --stream --parallel",
+    "deploy": "lerna run --stream --parallel deploy --",
     "test": "lerna run --stream test",
     "test:ci": "lerna run --stream test:ci"
   },

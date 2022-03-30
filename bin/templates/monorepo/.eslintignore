@@ -3,3 +3,4 @@ dist
 coverage
 *.d.ts
 .eslintrc.js
+workers-site

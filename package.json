@@ -1,6 +1,6 @@
 {
   "name": "frontend-monorepo-cli",
-  "version": "1.0.3",
+  "version": "1.0.7",
   "author": "Alessandro Moretto <moro.ale.93@gmail.com>",
   "license": "MIT",
   "bin": {

@@ -53,6 +53,17 @@ async function createTsLibrary() {
     await fs.writeFile(path.resolve(pkgDir, './package.json'), JSON.stringify(merge.all([JSON.parse(newPackageJson), reactAppJson]), null, 2));
     // install packages
     await executeCommand('yarn install');
+    // create the wrangler file
+    const wranglerFileContent = await fs.readFile(path.resolve(__dirname, './partial-templates/react-app-base/wrangler.toml'), 'utf8');
+    const cleanPackageName = packageName.replace(/-/g, '');
+    const replacedWranglerFileContent = wranglerFileContent.replace(/<APP-NAME>/g, cleanPackageName);
+    await fs.writeFile(path.resolve(pkgDir, './wrangler.toml'), replacedWranglerFileContent);
+    // add application links on readme
+    await executeCommand(`echo "" >> ./packages/${packageName}/README.md`);
+    await executeCommand(`echo "## Application links" >> ./packages/${packageName}/README.md`);
+    await executeCommand(`echo "" >> ./packages/${packageName}/README.md`);
+    await executeCommand(`echo "- [Staging app](https://${cleanPackageName}staging.amoretto.it)" >> ./packages/${packageName}/README.md`);
+    await executeCommand(`echo "- [Production app](https://${cleanPackageName}.amoretto.it)" >> ./packages/${packageName}/README.md`);
   } catch (error) {
     console.error(error);
   }
