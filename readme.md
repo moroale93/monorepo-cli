@@ -11,19 +11,41 @@ Add now the following secrets:
 - GIT_PUBLISHER_EMAIL: email of the publisher
 - NPM_TOKEN: token for the npm registry
 
-## How to use
-
-The following command generates the monorepo structure:
+## How to's
+### How to generate the monorepo
+Before you can use the CLI, you need to create a new repository.
+Once done, you enter the repo and run the following command:
 ```sh
 generate-monorepo
 ```
+This setups the monorepo structure.
 
-The following command adds a react app to the monorepo:
+### How to add a React application package to the monorepo
+You just need to execute the following command from the root of the monorepo:
 ```sh
 create-react-app <app-name> --o=<owner-name> --d=<app-description>
 ```
+PS: options are optional.
 
-The following command adds a TS library to the monorepo:
+### How to add a Typescript library package to the monorepo
+You just need to execute the following command from the root of the monorepo:
 ```sh
 create-ts-library <library-name> --o=<owner-name> --d=<library-description>
 ```
+PS: options are optional.
+
+### How to setup the CICD
+Github Actions is the CICD system.
+To make it working, you need to create a new environment at repository level.
+The name of the environment is `cicd`.
+Once done, you should add the following secrets to the `cicd` environment:
+- CF_API_KEY = The Cloudflare global API key 
+- CF_API_TOKEN = The Cloudflare global API token
+- CF_EMAIL = The Cloudflare global email
+- CF_ZONE_ID = The Cloudflare zone id to deploy the application 
+- NPM_TOKEN = Your npm token
+- GIT_PUBLISHER_EMAIL = The email of your gihub repo contributor, which will be used as the publisher of new versions
+
+When you open a PR on github, the code will be checked (linted, tested and built).
+When a PR is merged to the main branch, every TS libary will be deployed to NPM, and every React app will be deployed to Cloudflare (to a staging site).
+When you create a Github release, and every React app will be deployed to Cloudflare (to the production site).
