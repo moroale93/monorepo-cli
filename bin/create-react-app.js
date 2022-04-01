@@ -62,8 +62,8 @@ async function createTsLibrary() {
     await executeCommand(`echo "" >> ./packages/${packageName}/README.md`);
     await executeCommand(`echo "## Application links" >> ./packages/${packageName}/README.md`);
     await executeCommand(`echo "" >> ./packages/${packageName}/README.md`);
-    await executeCommand(`echo "- [Staging app](https://${cleanPackageName}staging.amoretto.it)" >> ./packages/${packageName}/README.md`);
-    await executeCommand(`echo "- [Production app](https://${cleanPackageName}.amoretto.it)" >> ./packages/${packageName}/README.md`);
+    await executeCommand(`echo "- [Staging app](https://${cleanPackageName}staging.alemoretto.it)" >> ./packages/${packageName}/README.md`);
+    await executeCommand(`echo "- [Production app](https://${cleanPackageName}.alemoretto.it)" >> ./packages/${packageName}/README.md`);
   } catch (error) {
     console.error(error);
   }

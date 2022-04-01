@@ -7,7 +7,7 @@
     "clean": "rm -rf .jest-cache && find packages -type f -regex \".*/*.log\" | xargs rm -f && find packages -type d -regex \".*/build\" | xargs rm -rf && find packages -type d -regex \".*/dist\" | xargs rm -rf && find packages -type d -regex \".*/coverage\" | xargs rm -rf && lerna run clean",
     "lint": "eslint . --ext=.js,.jsx,.ts,.tsx",
     "start": "lerna run start --stream --parallel",
-    "deploy": "lerna run --stream --parallel deploy --",
+    "deploy": "lerna run --stream --concurrency 1 deploy --",
     "test": "lerna run --stream test",
     "test:ci": "lerna run --stream test:ci"
   },
@@ -31,6 +31,7 @@
     "eslint-config-google": "^0.14.0",
     "eslint-plugin-react": "^7.28.0",
     "jest": "^27.2.4",
+    "lerna": "^3.22.0",
     "npm-run-all": "^4.1.5",
     "ts-jest": "^27.1.1",
     "typescript": "^4.5.4"

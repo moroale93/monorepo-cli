@@ -14,7 +14,8 @@ jobs:
     needs: [ common ]
     runs-on: ubuntu-latest
     environment: cicd
-
+    env:
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -27,6 +28,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: code-builds
+          path: ./packages
       - name: Setup git email config
         run: git config --global user.email "$GIT_PUBLISHER_EMAIL"
         env:

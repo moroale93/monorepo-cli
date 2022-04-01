@@ -43,9 +43,15 @@ Once done, you should add the following secrets to the `cicd` environment:
 - CF_API_TOKEN = The Cloudflare global API token
 - CF_EMAIL = The Cloudflare global email
 - CF_ZONE_ID = The Cloudflare zone id to deploy the application 
-- NPM_TOKEN = Your npm token
+- NPM_TOKEN = Your npm token (with publishing rights)
 - GIT_PUBLISHER_EMAIL = The email of your gihub repo contributor, which will be used as the publisher of new versions
 
 When you open a PR on github, the code will be checked (linted, tested and built).
 When a PR is merged to the main branch, every TS libary will be deployed to NPM, and every React app will be deployed to Cloudflare (to a staging site).
 When you create a Github release, and every React app will be deployed to Cloudflare (to the production site).
+
+### How to get the Cloudflare secrets
+- CF_ZONE_ID = You can find it on the Cloudflare dashboard homepage, clicking on the website you want to deploy to, and you find it on the right side of the page.
+- CF_EMAIL = The email of the Cloudflare account owner
+- CF_API_KEY = You can generate one from your profile page > API Tokens > Global API Key
+- CF_API_TOKEN = You can generate one from your profile page > API Tokens > Create Token > Edit Cloudflare Workers

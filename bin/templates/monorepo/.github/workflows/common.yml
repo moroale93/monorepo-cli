@@ -36,6 +36,8 @@ jobs:
         with:
           path: '**/node_modules'
           key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+      - name: Install dependencies
+        run: yarn install
       - name: Check for changed packages
         run: CHANGED_PACKAGES=$(yarn --silent changed | paste -sd, -)
       - name: Link changed packages

@@ -52,10 +52,12 @@ function deploy(package, environment) {
   req.end();
 }
 
-if (!process.argv.length ||
-  ['development', 'staging', 'production'].indexOf(process.argv[2]) === -1) {
+const index = process.argv.findIndex((val) =>
+  ['development', 'staging', 'production'].indexOf(val) !== -1);
+
+if (index === -1) {
   console.error('Please provide an environment as an argument');
   process.exit(1);
 }
 
-executeOnAppDirectories('./packages', process.argv[0], deploy);
+executeOnAppDirectories('./packages', process.argv[index], deploy);
