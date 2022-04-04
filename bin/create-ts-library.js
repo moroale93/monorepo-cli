@@ -53,6 +53,14 @@ async function createTsLibrary() {
     await fs.writeFile(path.resolve(pkgDir, './package.json'), JSON.stringify(merge.all([JSON.parse(newPackageJson), tsPackageJson]), null, 2));
     // install packages
     await executeCommand('yarn install');
+    // add application links on readme
+    await executeCommand(`rm ./packages/${packageName}/README.md`);
+    await executeCommand(`echo "[![NPM version](http://img.shields.io/npm/v/${packageName}.svg)](https://www.npmjs.org/package/${packageName})" >> ./packages/${packageName}/README.md`);
+    await executeCommand(`echo "# ${packageName}" >> ./packages/${packageName}/README.md`);
+    await executeCommand(`echo "" >> ./packages/${packageName}/README.md`);
+    await executeCommand(`echo "\`\`\`sh" >> ./packages/${packageName}/README.md`);
+    await executeCommand(`echo "npm install -g ${packageName}" >> ./packages/${packageName}/README.md`);
+    await executeCommand(`echo "\`\`\`" >> ./packages/${packageName}/README.md`);
   } catch (error) {
     console.error(error);
   }

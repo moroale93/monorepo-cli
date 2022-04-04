@@ -1,3 +1,6 @@
+[![CICD](https://github.com/moroale93/monorepo-cli/actions/workflows/main.yml/badge.svg?branch=main&event=push)](https://github.com/moroale93/monorepo-cli/actions/workflows/main.yml)
+[![NPM version](http://img.shields.io/npm/v/frontend-monorepo-cli.svg)](https://www.npmjs.org/package/frontend-monorepo-cli)
+
 ## How to setup
 This project is a CLI to setup a monorepo and create various types of packages.
 

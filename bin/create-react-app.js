@@ -59,6 +59,8 @@ async function createTsLibrary() {
     const replacedWranglerFileContent = wranglerFileContent.replace(/<APP-NAME>/g, cleanPackageName);
     await fs.writeFile(path.resolve(pkgDir, './wrangler.toml'), replacedWranglerFileContent);
     // add application links on readme
+    await executeCommand(`rm ./packages/${packageName}/README.md`);
+    await executeCommand(`echo "# ${packageName}" >> ./packages/${packageName}/README.md`);
     await executeCommand(`echo "" >> ./packages/${packageName}/README.md`);
     await executeCommand(`echo "## Application links" >> ./packages/${packageName}/README.md`);
     await executeCommand(`echo "" >> ./packages/${packageName}/README.md`);
